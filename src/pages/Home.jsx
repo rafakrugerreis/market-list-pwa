@@ -6,7 +6,8 @@ import TotalBar from "../components/TotalBar.jsx";
 import useItems from "../hooks/useItems.js";
 
 function Home() {
-  const { items, loading, addItem, updateItem, deleteItem } = useItems();
+  const { items, loading, addItem, updateItem, deleteItem, checkAll } =
+    useItems();
   const [showAddModal, setShowAddModal] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -59,6 +60,14 @@ function Home() {
         <button className="btn-add-item" onClick={openAddModal}>
           Adicionar Item
         </button>
+        {items.length > 0 && (
+          <button
+            className="btn-action"
+            onClick={() => checkAll(!items.every((i) => i.checked))}
+          >
+            {items.every((i) => i.checked) ? "Desmarcar todos" : "Marcar todos"}
+          </button>
+        )}
       </div>
 
       <main className="items-list">

@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function AddItemModal({ initialData, onSave, onClose, onOpenScanner }) {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState(1);
+  const modalRef = useRef(null);
 
   useEffect(() => {
     if (initialData) {
@@ -14,6 +15,17 @@ function AddItemModal({ initialData, onSave, onClose, onOpenScanner }) {
       setQuantity(initialData.quantity || 1);
     }
   }, [initialData]);
+
+  useEffect(() => {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+  }, []);
+
+  const handleFocus = (e) => {
+    const target = e.target;
+    setTimeout(() => {
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 350);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -28,7 +40,11 @@ function AddItemModal({ initialData, onSave, onClose, onOpenScanner }) {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="modal"
+        ref={modalRef}
+        onClick={(e) => e.stopPropagation()}
+      >
         <h2>{initialData ? "Editar Item" : "Novo Item"}</h2>
 
         <form onSubmit={handleSubmit}>
@@ -39,6 +55,7 @@ function AddItemModal({ initialData, onSave, onClose, onOpenScanner }) {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              onFocus={handleFocus}
               placeholder="ex: Maçãs"
               autoFocus
               required
@@ -55,6 +72,7 @@ function AddItemModal({ initialData, onSave, onClose, onOpenScanner }) {
                 min="0"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
+                onFocus={handleFocus}
                 placeholder="0,00"
               />
             </div>
@@ -66,6 +84,7 @@ function AddItemModal({ initialData, onSave, onClose, onOpenScanner }) {
                 min="1"
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
+                onFocus={handleFocus}
                 required
               />
             </div>

@@ -41,3 +41,12 @@ export async function deleteItem(id) {
   const { error } = await supabase.from(TABLE).delete().eq("id", id);
   if (error) throw error;
 }
+
+export async function checkAllItems(ids, checked) {
+  if (!ids.length) return;
+  const { error } = await supabase
+    .from(TABLE)
+    .update({ checked })
+    .in("id", ids);
+  if (error) throw error;
+}

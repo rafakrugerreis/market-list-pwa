@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import {
   addItem as apiAddItem,
+  checkAllItems as apiCheckAll,
   deleteItem as apiDeleteItem,
   updateItem as apiUpdateItem,
   fetchItems,
@@ -43,7 +44,13 @@ function useItems() {
     setItems((prev) => prev.filter((i) => i.id !== id));
   };
 
-  return { items, loading, addItem, updateItem, deleteItem };
+  const checkAll = async (checked) => {
+    const ids = items.map((i) => i.id);
+    await apiCheckAll(ids, checked);
+    setItems((prev) => prev.map((i) => ({ ...i, checked })));
+  };
+
+  return { items, loading, addItem, updateItem, deleteItem, checkAll };
 }
 
 export default useItems;
