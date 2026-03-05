@@ -10,7 +10,6 @@ export async function scanProductLabel(imageSource) {
 
   const price = parsePrice(text);
 
-  // Usa a primeira linha não-vazia como nome do produto
   const lines = text.split("\n").filter((l) => l.trim().length > 2);
   const name = lines[0]?.trim() || "";
 
