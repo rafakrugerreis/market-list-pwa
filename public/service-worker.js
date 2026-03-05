@@ -1,4 +1,4 @@
-const CACHE_NAME = "market-list-v3";
+const CACHE_NAME = "market-list-v4";
 
 const STATIC_ASSETS = ["/", "/index.html", "/manifest.json"];
 
@@ -27,31 +27,49 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
+  const url = new URL(event.request.url);
 
-      return fetch(event.request)
-        .then((response) => {
-          if (
-            !response ||
-            response.status !== 200 ||
-            response.type === "opaque"
-          ) {
-            return response;
+  // Documentos HTML: network-first, sem cache.
+  // Evita que index.html desatualizado sirva hashes de JS antigos.
+  if (event.request.destination === "document" || url.pathname === "/") {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match("/index.html")),
+    );
+    return;
+  }
+
+  // Assets com hash no nome (JS/CSS do Vite): cache-first —
+  // o hash garante que o conteúdo nunca muda para aquele nome.
+  if (url.pathname.startsWith("/assets/")) {
+    event.respondWith(
+      caches.match(event.request).then((cached) => {
+        if (cached) return cached;
+        return fetch(event.request).then((response) => {
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches
+              .open(CACHE_NAME)
+              .then((cache) => cache.put(event.request, clone));
           }
+          return response;
+        });
+      }),
+    );
+    return;
+  }
 
+  // Demais recursos: network-first com fallback no cache.
+  event.respondWith(
+    fetch(event.request)
+      .then((response) => {
+        if (response && response.status === 200 && response.type !== "opaque") {
           const clone = response.clone();
           caches
             .open(CACHE_NAME)
             .then((cache) => cache.put(event.request, clone));
-          return response;
-        })
-        .catch(() => {
-          if (event.request.destination === "document") {
-            return caches.match("/index.html");
-          }
-        });
-    }),
+        }
+        return response;
+      })
+      .catch(() => caches.match(event.request)),
   );
 });
