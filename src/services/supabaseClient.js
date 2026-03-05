@@ -5,7 +5,7 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-const TABLE = "Items";
+const TABLE = "items";
 
 export async function fetchItems() {
   const { data, error } = await supabase
