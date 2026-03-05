@@ -51,35 +51,27 @@ function Home() {
     <div className="app-container">
       {/* ── Header ── */}
       <header className="app-header">
-        <button className="header-menu-btn" aria-label="Menu">
-          ☰
-        </button>
-        <h1>Grocery List</h1>
-        <button className="header-settings-btn">Settings</button>
+        <h1>Lista de Compras</h1>
       </header>
 
       {/* ── Action bar ── */}
       <div className="action-bar">
         <button className="btn-add-item" onClick={openAddModal}>
-          Add Item
+          Adicionar Item
         </button>
-        <button className="btn-action" onClick={handleEdit.bind(null, null)}>
-          Edit
-        </button>
-        <button className="btn-action">Remove</button>
       </div>
 
       <main className="items-list">
-        {loading && <p className="loading">Loading...</p>}
+        {loading && <p className="loading">Carregando itens...</p>}
         {!loading && items.length === 0 && (
           <div className="empty-state">
             <div className="empty-icon-wrap">
               <span className="empty-basket-icon">🧺</span>
             </div>
-            <h2>Your list is empty</h2>
-            <p>Tap Add Item to start shopping and populate your list.</p>
+            <h2>Sua lista está vazia</h2>
+            <p>Toque em Adicionar Item para começar a montar sua lista.</p>
             <button className="btn-empty-add" onClick={openAddModal}>
-              + Add Item
+              + Adicionar Item
             </button>
           </div>
         )}
@@ -103,7 +95,7 @@ function Home() {
           onClick={() => setActiveTab("list")}
         >
           <span className="nav-icon-wrap">📋</span>
-          List
+          Lista
         </button>
         <button
           className={`nav-item ${activeTab === "ocr" ? "active" : ""}`}
@@ -113,14 +105,7 @@ function Home() {
           }}
         >
           <span className="nav-icon-wrap">🔍</span>
-          OCR Scanner
-        </button>
-        <button
-          className={`nav-item ${activeTab === "profile" ? "active" : ""}`}
-          onClick={() => setActiveTab("profile")}
-        >
-          <span className="nav-icon-wrap">👤</span>
-          Profile
+          Scanner OCR
         </button>
       </nav>
 

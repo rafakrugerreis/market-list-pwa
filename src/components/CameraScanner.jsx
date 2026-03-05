@@ -58,7 +58,7 @@ function CameraScanner({ onScanned, onClose }) {
       stopCamera();
       onScanned(result);
     } catch (err) {
-      setError("OCR failed. Try again with better lighting.");
+      setError("Falha no OCR. Tente novamente com melhor iluminação.");
     } finally {
       setScanning(false);
     }
@@ -68,8 +68,8 @@ function CameraScanner({ onScanned, onClose }) {
     <div className="scanner-overlay">
       {/* Header */}
       <div className="scanner-header">
-        <span className="scanner-title">Scan Product</span>
-        <button className="scanner-flash-btn" aria-label="Flash">
+        <span className="scanner-title">Escanear Produto</span>
+        <button className="scanner-flash-btn" aria-label="Lanterna">
           🔦
         </button>
       </div>
@@ -96,11 +96,11 @@ function CameraScanner({ onScanned, onClose }) {
             {/* Extracted fields overlay */}
             <div className="scanner-fields">
               <div>
-                <div className="scanner-field-label">🏷 Product Name</div>
+                <div className="scanner-field-label">🏷 Nome do Produto</div>
                 <div className="scanner-field-box">{extracted.name}</div>
               </div>
               <div>
-                <div className="scanner-field-label">🏷 Price</div>
+                <div className="scanner-field-label">🏷 Preço</div>
                 <div className="scanner-field-box">{extracted.price}</div>
               </div>
             </div>
@@ -115,15 +115,15 @@ function CameraScanner({ onScanned, onClose }) {
       )}
       {scanning && (
         <p className="scanning-text" style={{ padding: "10px 0 0" }}>
-          Processing OCR...
+          Processando OCR...
         </p>
       )}
 
-      <p className="scanner-hint">Point camera at product label</p>
+      <p className="scanner-hint">Aponte a câmera para a etiqueta do produto</p>
 
       <div className="scanner-bottom">
         <button className="btn-scanner-cancel" onClick={onClose}>
-          Cancel
+          Cancelar
         </button>
         <button
           className="btn-scanner-capture"

@@ -8,13 +8,15 @@ function TotalBar({ items, onAdd }) {
   return (
     <div className="total-bar">
       <div className="total-pill">
-        <span className="total-label">Total:</span>
+        <span className="total-label">Total Comprado:</span>
         <span className="total-value">
           R$ {total.toFixed(2).replace(".", ",")}
         </span>
-        <span className="total-count">{checkedItems.length} items</span>
+        <span className="total-count">
+          {checkedItems.length} {checkedItems.length === 1 ? "item" : "itens"}
+        </span>
       </div>
-      <button className="btn-fab" onClick={onAdd} aria-label="Add item">
+      <button className="btn-fab" onClick={onAdd} aria-label="Adicionar item">
         +
       </button>
     </div>

@@ -29,17 +29,17 @@ function AddItemModal({ initialData, onSave, onClose, onOpenScanner }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <h2>{initialData ? "Edit Item" : "Add New Item"}</h2>
+        <h2>{initialData ? "Editar Item" : "Novo Item"}</h2>
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="item-name">Item Name</label>
+            <label htmlFor="item-name">Nome do Produto</label>
             <input
               id="item-name"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Apples"
+              placeholder="ex: Maçãs"
               autoFocus
               required
             />
@@ -47,7 +47,7 @@ function AddItemModal({ initialData, onSave, onClose, onOpenScanner }) {
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="item-price">Price (R$)</label>
+              <label htmlFor="item-price">Preço (R$)</label>
               <input
                 id="item-price"
                 type="number"
@@ -55,11 +55,11 @@ function AddItemModal({ initialData, onSave, onClose, onOpenScanner }) {
                 min="0"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
-                placeholder="0.00"
+                placeholder="0,00"
               />
             </div>
             <div className="form-group">
-              <label htmlFor="item-quantity">Quantity</label>
+              <label htmlFor="item-quantity">Quantidade</label>
               <input
                 id="item-quantity"
                 type="number"
@@ -77,7 +77,7 @@ function AddItemModal({ initialData, onSave, onClose, onOpenScanner }) {
               className="btn-scan-label"
               onClick={onOpenScanner}
             >
-              <span>⬛</span> Scan Label to Auto-fill
+              <span>⬛</span> Escanear Etiqueta
             </button>
           )}
 
@@ -87,10 +87,10 @@ function AddItemModal({ initialData, onSave, onClose, onOpenScanner }) {
               className="btn-modal-cancel"
               onClick={onClose}
             >
-              Cancel
+              Cancelar
             </button>
             <button type="submit" className="btn-modal-confirm">
-              {initialData ? "Save" : "Add Item"}
+              {initialData ? "Salvar" : "Adicionar"}
             </button>
           </div>
         </form>

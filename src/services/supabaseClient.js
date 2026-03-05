@@ -5,9 +5,11 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+const TABLE = "Items";
+
 export async function fetchItems() {
   const { data, error } = await supabase
-    .from("items")
+    .from(TABLE)
     .select("*")
     .order("created_at", { ascending: true });
   if (error) throw error;
@@ -16,7 +18,7 @@ export async function fetchItems() {
 
 export async function addItem(item) {
   const { data, error } = await supabase
-    .from("items")
+    .from(TABLE)
     .insert([item])
     .select()
     .single();
@@ -26,7 +28,7 @@ export async function addItem(item) {
 
 export async function updateItem(id, changes) {
   const { data, error } = await supabase
-    .from("items")
+    .from(TABLE)
     .update(changes)
     .eq("id", id)
     .select()
@@ -36,6 +38,6 @@ export async function updateItem(id, changes) {
 }
 
 export async function deleteItem(id) {
-  const { error } = await supabase.from("items").delete().eq("id", id);
+  const { error } = await supabase.from(TABLE).delete().eq("id", id);
   if (error) throw error;
 }

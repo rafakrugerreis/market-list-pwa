@@ -1,6 +1,6 @@
 function ItemCard({ item, onEdit, onDelete, onToggle }) {
   const total = (Number(item.price) * Number(item.quantity)).toFixed(2);
-  const detail = `${item.quantity} ${item.quantity === 1 ? "unit" : "units"} | R$ ${Number(item.price).toFixed(2)}/unit`;
+  const detail = `${item.quantity} ${item.quantity === 1 ? "unid." : "unid."} | R$ ${Number(item.price).toFixed(2)}/un`;
 
   return (
     <div className={`item-card ${item.checked ? "item-checked" : ""}`}>
