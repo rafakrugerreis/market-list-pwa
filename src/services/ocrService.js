@@ -6,11 +6,11 @@ import { parsePrice } from "../utils/priceParser.js";
  */
 const NOISE_LINE = [
   /^\s*[\d\s\-\.]{6,}\s*$/,
-  /\b(IBPT|TRIB|VL\.?\s*APROX)\b/i, 
-  /\b(QUILO|KG\b|\/KG|KILO)\b/i, 
-  /\bmm\b/i, 
-  /^R\$\s*[\d.,]+$/, 
-  /^[0-9 ]{8,}$/, 
+  /\b(IBPT|TRIB|VL\.?\s*APROX)\b/i,
+  /\b(QUILO|KG\b|\/KG|KILO)\b/i,
+  /\bmm\b/i,
+  /^R\$\s*[\d.,]+$/,
+  /^[0-9 ]{8,}$/,
 ];
 
 /**
@@ -48,16 +48,57 @@ function extractName(text) {
 }
 
 /**
+ * Pré-processa o canvas para melhorar acurácia do OCR:
+ * - Escala para largura mínima de 1200px
+ * - Converte para escala de cinza
+ * - Binariza (limiar em 128) → texto preto sobre fundo branco
+ * Ideal para etiquetas amarelas com texto preto (padrão BR).
+ */
+function preprocessCanvas(canvas) {
+  const MIN_WIDTH = 1200;
+  let sw = canvas.width;
+  let sh = canvas.height;
+
+  if (sw < MIN_WIDTH) {
+    const scale = MIN_WIDTH / sw;
+    sw = Math.round(sw * scale);
+    sh = Math.round(sh * scale);
+  }
+
+  const out = document.createElement("canvas");
+  out.width = sw;
+  out.height = sh;
+  const ctx = out.getContext("2d");
+  ctx.drawImage(canvas, 0, 0, sw, sh);
+
+  const imgData = ctx.getImageData(0, 0, sw, sh);
+  const d = imgData.data;
+
+  for (let i = 0; i < d.length; i += 4) {
+    const gray = Math.round(0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]);
+    const bin = gray < 128 ? 0 : 255;
+    d[i] = d[i + 1] = d[i + 2] = bin;
+  }
+
+  ctx.putImageData(imgData, 0, 0);
+  return out;
+}
+
+/**
  * Escaneia uma etiqueta de produto via OCR e retorna { name, price }.
  */
 export async function scanProductLabel(imageSource) {
+  const input =
+    imageSource instanceof HTMLCanvasElement
+      ? preprocessCanvas(imageSource)
+      : imageSource;
+
   const {
     data: { text },
-  } = await Tesseract.recognize(imageSource, "por+eng", {
+  } = await Tesseract.recognize(input, "por+eng", {
     logger: (m) => console.log("[OCR]", m.status, m.progress),
+    tessedit_pageseg_mode: "6",
   });
-
-  console.log("[OCR] Texto bruto:\n", text);
 
   const price = parsePrice(text);
   const name = extractName(text);

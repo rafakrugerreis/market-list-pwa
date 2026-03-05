@@ -7,7 +7,7 @@ function CameraScanner({ onScanned, onClose }) {
   const streamRef = useRef(null);
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState(null);
-  const [extracted, setExtracted] = useState({ name: "", price: "" });
+  const [result, setResult] = useState(null);
 
   useEffect(() => {
     startCamera();
@@ -27,8 +27,9 @@ function CameraScanner({ onScanned, onClose }) {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }
+      setError(null);
     } catch (err) {
-      setError("Camera access denied or not available on this device.");
+      setError("Câmera não disponível ou acesso negado.");
     }
   };
 
@@ -48,15 +49,12 @@ function CameraScanner({ onScanned, onClose }) {
     canvas.getContext("2d").drawImage(video, 0, 0);
 
     setScanning(true);
-    setExtracted({ name: "", price: "" });
+    setResult(null);
+    setError(null);
     try {
-      const result = await scanProductLabel(canvas);
-      setExtracted({
-        name: result.name || "",
-        price: result.price ? String(result.price) : "",
-      });
+      const scanned = await scanProductLabel(canvas);
       stopCamera();
-      onScanned(result);
+      setResult(scanned);
     } catch (err) {
       setError("Falha no OCR. Tente novamente com melhor iluminação.");
     } finally {
@@ -64,14 +62,28 @@ function CameraScanner({ onScanned, onClose }) {
     }
   };
 
+  const handleRetry = () => {
+    setResult(null);
+    setError(null);
+    startCamera();
+  };
+
+  const handleConfirm = () => {
+    if (result) onScanned(result);
+  };
+
+  const formatPrice = (p) =>
+    p ? `R$ ${Number(p).toFixed(2).replace(".", ",")}` : "—";
+
   return (
     <div className="scanner-overlay">
       {/* Header */}
       <div className="scanner-header">
-        <span className="scanner-title">Escanear Produto</span>
-        <button className="scanner-flash-btn" aria-label="Lanterna">
-          🔦
+        <button className="btn-voltar" onClick={onClose}>
+          ← Voltar
         </button>
+        <span className="scanner-title">Escanear Produto</span>
+        <div style={{ width: 72 }} />
       </div>
 
       {/* Video + Viewfinder */}
@@ -91,19 +103,7 @@ function CameraScanner({ onScanned, onClose }) {
             <span className="scanner-corner tr" />
             <span className="scanner-corner bl" />
             <span className="scanner-corner br" />
-            {!scanning && <div className="scanner-line" />}
-
-            {/* Extracted fields overlay */}
-            <div className="scanner-fields">
-              <div>
-                <div className="scanner-field-label">🏷 Nome do Produto</div>
-                <div className="scanner-field-box">{extracted.name}</div>
-              </div>
-              <div>
-                <div className="scanner-field-label">🏷 Preço</div>
-                <div className="scanner-field-box">{extracted.price}</div>
-              </div>
-            </div>
+            {!scanning && !result && <div className="scanner-line" />}
           </div>
         </div>
       </div>
@@ -113,28 +113,56 @@ function CameraScanner({ onScanned, onClose }) {
           {error}
         </p>
       )}
+
       {scanning && (
         <p className="scanning-text" style={{ padding: "10px 0 0" }}>
           Processando OCR...
         </p>
       )}
 
-      <p className="scanner-hint">Aponte a câmera para a etiqueta do produto</p>
+      {/* Card de resultado após escaneamento */}
+      {result && (
+        <div className="scanner-result">
+          <div className="scanner-result-row">
+            <span className="scanner-result-label">Nome</span>
+            <span className="scanner-result-value">{result.name || "—"}</span>
+          </div>
+          <div className="scanner-result-row">
+            <span className="scanner-result-label">Preço</span>
+            <span className="scanner-result-value">
+              {formatPrice(result.price)}
+            </span>
+          </div>
+          <div className="scanner-result-actions">
+            <button className="btn-retry" onClick={handleRetry}>
+              Tentar novamente
+            </button>
+            <button className="btn-usar" onClick={handleConfirm}>
+              Usar este item
+            </button>
+          </div>
+        </div>
+      )}
 
-      <div className="scanner-bottom">
-        <button className="btn-scanner-cancel" onClick={onClose}>
-          Cancelar
-        </button>
-        <button
-          className="btn-scanner-capture"
-          onClick={capturePhoto}
-          disabled={scanning || !!error}
-          aria-label="Capture"
-        >
-          ⬛
-        </button>
-        <div className="scanner-spacer" />
-      </div>
+      {!result && !scanning && (
+        <>
+          <p className="scanner-hint">
+            Aponte a câmera para a etiqueta do produto
+          </p>
+          <div className="scanner-bottom">
+            <div className="scanner-spacer" />
+            <button
+              className="btn-scanner-capture"
+              onClick={capturePhoto}
+              disabled={!!error}
+              aria-label="Capturar"
+            >
+              ⬛
+            </button>
+            <div className="scanner-spacer" />
+          </div>
+        </>
+      )}
     </div>
   );
 }
